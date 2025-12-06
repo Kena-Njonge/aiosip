@@ -26,8 +26,15 @@ class Via(MutableMapping):
             self._via['params'] = Param()
         if not isinstance(params, Param):
             self._via['params'] = Param(self._via['params'])
+        
+        sentby = self._via['sentby']
+        # Port mustn't be specified, section 25 of RFC 3261
+        if ':' in sentby:
+            host, port = sentby.rsplit(':', 1)
+        else:
+            host, port = sentby, '5060'
+        self._via['host'], self._via['port'] = host, int(port)
 
-        self._via['host'], self._via['port'] = self._via['sentby'].rsplit(':', 1)
 
     @classmethod
     def from_header(cls, via):
